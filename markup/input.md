@@ -64,7 +64,9 @@
 </label>
 ```
 
-그러나 일반적으로 체크박스를 표현할 때 별도의 이미지 아이콘을 많이 사용하므로 이 방법엔 한계가 있고, 기기마다 표현 방법이 다를 수 있습니다.
+그러나 일반적으로 체크박스를 표현할 때 별도의 이미지 아이콘을 많이 사용하는 까닭에 이 방법엔 한계가 있습니다.
+
+더군다나 기기마다 표현 방법이 다를 수 있습니다. 😱
 
 때문에 아래와 같이 input 요소는 숨겨서 표현 합니다.
 
@@ -176,7 +178,7 @@ const SampleCheckbox: FC<Props> = ({ checked = false, onChange }) => {
   return (
     <label>
       <Checkbox checked={checked} onChange={handleChange} />
-      {/* 아이콘에 checked 와 uncheced 2 종류가 있다 가정합니다. */}
+      {/* 아이콘에 checked 와 unchecked 2 종류가 있다 가정합니다. */}
       <i className={classnames('icon', { checked, unchecked: !checked })}>
     </label>
   );
@@ -190,15 +192,17 @@ const SampleCheckbox: FC<Props> = ({ checked = false, onChange }) => {
 다른점은 아래와 같이 2가지 입니다.
 
 1. 반드시 `<form>` 요소로 감싼 곳에서 사용
-2. 각 `<input>` 요소에 name 과 value 를 미리 줄 것.
+2. 각 `<input>` 요소에 name 과 value 를 미리 지정 할 것.
 
 #### form 에 감싸고 name 과 value 를 설정해야 하는 이유
 
-다른 입력 요소 (input element)들도 마찬가지지만, 라디오버튼은 여러개 중 단 1개를 선택하는 UI 입니다.
+다른 입력 요소 (input element)들도 마찬가지지만, 라디오 버튼은 여러개 중 단 1개를 선택하는 UI 입니다.
 
-이에 대해 웹표준 방식으로 제어 하기 위해선 form 안에 위치 해서 영역(scope)을 한정 짓습니다.
+이에 대해 웹표준 방식으로 제어하기 위해선 form 안에 input을 넣고 동작 영역(scope)을 한정 지어야 합니다.
 
-그리고 이들이 서로 연관된 것은 `name` 으로 지정하게 됩니다. 즉, 같은 이름의 라디오 버튼이면 하나만 선택 하게 됩니다.
+그리고 이들이 서로 연관된 것은 `name` 으로 지정해야 합니다.
+
+이 상태에서 라디오 버튼 클릭 시, 같은 이름의 라디오 버튼일 경우 하나만 선택되는 동작이 자연스레 이뤄집니다.
 
 마지막으로 `value`는 선택했을 때 전달될 값 입니다.
 
@@ -269,7 +273,7 @@ const RadioList: FC<Props> = ({ value, onChange }) => {
 
 또 한 웹표준 방법을 사용하면, DOM 의 checked 상태를 직접적으로 알 수 있기 때문에 자동 테스트를 구성할 때도 용이합니다.
 
-### jsfiddle 샘플
+### jsfiddle 샘플 예제
 
 - [checkbox](https://jsfiddle.net/u3n926mp/6/)
 - [radiobutton](https://jsfiddle.net/yhtmzeus/)
