@@ -4,6 +4,29 @@
 
 본 문서는 코딩 시 빈번히 발생되는 변수명에 대한 작성 가이드를 알려 드립니다.
 
+## 기본 작성 방법
+
+변수는 특별한 사유가 없다면 `camel-case` 로 작성합니다.
+
+그리고 변수 선언 문은 로직 진행 중 값이 변동된다면 `let` 을, 그렇지 않다면 `const`를 이용합니다.
+
+`var`는 정적 페이지를 만들거나 외부 스크립트 삽입등의 이유가 아니면 절대 사용하지 않습니다.
+
+```ts
+// 이후에 변경이 있습니다.
+let complexCompanyName = '고위드';
+
+if (isProjectCompleted()) {
+  complexCompanyName = '고위드 완성!';
+}
+
+// 변경이 없을 때
+const snowWhiteSmile = '미소는 아름답습니다 :)';
+
+// Nope! 쓰지 않습니다.
+var myNumber = 1234;
+```
+
 ## 복수형(Plural)
 
 기본적으로 복수형으로 표현이 가능한 변수는 그대로 사용될 수 있습니다. (예: user -> users, product -> products)
