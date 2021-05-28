@@ -117,7 +117,7 @@ export const effChooseUserFavoriteThings = createAsyncThunk<
 
 ## 다이어그램
 
-<img width="600" src="images/architecture-diagram-store.png" alt="스토어" />
+<img width="600" src="images/architecture-diagram_store.png" alt="스토어" />
 
 ## 구조
 
