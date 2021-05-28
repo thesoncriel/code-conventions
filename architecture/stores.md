@@ -1,10 +1,123 @@
 # Architecture: Stores
 
-Redux 스토어 작성 시 필요한 규칙을 다룹니다.
+Redux 스토어 작성 시 알아두면 좋을 사전 지식과 필요한 규칙을 다룹니다.
+
+## 스토어의 배경
+
+스토어는 Flux Architecture 에서 고안된 개념입니다.
+
+이는 UI 영역에서 빈번하게 이루어지는 상태 관리를 특정 관리자(State Manager)가 관리하는 형태가 만들어지는 것이 그 시작이라 볼 수 있습니다.
+
+이 때 데이터는 일종의 Database 로 취급되며 관리자는 상태 데이터를 다룸에 있어 DBMS(Database Management System)의 역할을 수행하게 됩니다.
+
+한편 사용자와 상호작용을 맡는 View 는 관리자가 제공하는 상태값을 단순히 받아서 이용하게 됩니다.
+
+### 부분별 목적
+
+스토어는 다양한 구성요소를 가지고 있습니다.
+
+기본적으로 `reducer`, `action`, `effect`, `selector` 를 가질 수 있습니다.
+
+이 중 effect 나 selector 는 자료를 조작하거나 제공하는 주체이기에 많은 경우, 그 기능이 복잡 해 질 수 있습니다.
+
+```ts
+// 단순한 이펙트 예시
+export const effChooseUserFavoriteThings = createAsyncThunk(async (payload) => {
+  const res = await repo.user.favorites(payload.userFavorite);
+
+  return res;
+});
+```
+
+복잡해 질 경우 다음과 같이 코드가 길어지고 가독성이 떨어지게 됩니다.
+
+```ts
+// 기능이 복잡한 이펙트 예시
+export const effChooseUserFavoriteThings = createAsyncThunk<
+  UserFavoriteThingUiModel[],
+  ChooseUserFavorite,
+  { state: RootState }
+>(async (payload, api) => {
+  try {
+    const res = await repo.user.favorites(payload.userFavorite);
+
+    const items = res.data.map(item => ({
+      idx: item.idx,
+      address: item.info.address.detail,
+      price: item.prod
+        ? item.prod.basePrice
+        : item.alt.sales.price * AMOUNT_PRICE_DICTIONARY[item.alt.key],
+    }));
+
+    const file = await loadFiles(payload.userAuth.idx);
+
+
+    const prmReader = new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onSuccess = () => {
+        resolve(reader.getData());
+      };
+      reader.onFail = (error) => {
+        reject(error)
+      };
+      reader.read(file);
+    });
+
+    const redData = await prmReader;
+
+    // and so on...
+
+    return res;
+  } catch(error) {
+    return api.rejectWithValue(error);
+  }
+});
+```
+
+이럴 때는 일반적으로 각 기능을 분리하여 이용하도록 리팩터링이 이루어집니다.
+
+리팩터링의 사유는 보시다시피 `코드가 지나치게 길고 복잡하기 때문` 입니다.
+
+이러한 코드의 복잡도를 줄이고 각 기능을 함수나 클래스로 모듈화 하여 코드 가독성을 높이고 관심사 분리를 이루고자 하는 것이 스토어내 기능 분리의 목적 입니다.
+
+> 코드가 길어지면 오류의 확률이 높아집니다.
+>
+> 코드를 간결히 유지 하세요! - Keep It Simple, Stupid !
+>
+> KISS -
+
+```ts
+// 변경된 복잡한 이펙트
+export const effChooseUserFavoriteThings = createAsyncThunk<
+  UserFavoriteThingUiModel[],
+  ChooseUserFavorite,
+  { state: RootState }
+>(async (payload, api) => {
+  try {
+    const res = await repo.user.favorites(payload.userFavorite);
+
+    // Entity 를 View 에서 쓰일 Ui Model 로 바꿔주는 converter
+    const items = toUserFavoriteThingUiModels(res.data);
+
+    // 데이터 처리를 하는 functions
+    const redData = await readExcelData(payload.userAuth);
+
+    // 사용자의 입력 유효성을 체크하는 validate
+    const validateResult = validatePayload(payload.userInput);
+
+    // and so on...
+
+    return res;
+  } catch(error) {
+    return api.rejectWithValue(error);
+  }
+});
+```
 
 ## 다이어그램
 
-<img width="400" src="images/architecture-diagram-store.png" alt="스토어" />
+<img width="600" src="images/architecture-diagram-store.png" alt="스토어" />
 
 ## 구조
 
